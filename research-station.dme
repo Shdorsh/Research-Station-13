@@ -2638,6 +2638,7 @@
 #include "interface\stylesheet.dm"
 #include "interface\skin.dmf"
 #include "research-station\code\modules\integrated_electronics\subtypes\input.dm"
+#include "research-station\code\modules\integrated_electronics\subtypes\lists.dm"
 #include "research-station\code\modules\integrated_electronics\subtypes\text.dm"
 #include "research-station\code\modules\integrated_electronics\subtypes\reagents.dm"
 // END_INCLUDE
