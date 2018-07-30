@@ -24,7 +24,7 @@
 	var/category_text = "NO CATEGORY THIS IS A BUG"	// To show up on circuit printer, and perhaps other places.
 	var/removable = TRUE 			// Determines if a circuit is removable from the assembly.
 	var/displayed_name = ""
-	
+	var/demands_object_input = FALSE	//RESEARCHSTATION ONLY
 /*
 	Integrated circuits are essentially modular machines.  Each circuit has a specific function, and combining them inside Electronic Assemblies allows
 a creative player the means to solve many problems.  Circuits are held inside an electronic assembly, and are wired using special tools.
@@ -34,6 +34,15 @@ a creative player the means to solve many problems.  Circuits are held inside an
 	interact(user)
 	external_examine(user)
 	. = ..()
+
+//RESEARCHSTATION ONLY START
+/obj/item/integrated_circuit/proc/additem(var/obj/item/I, var/mob/living/user)
+	if(!demands_object_input)
+		to_chat(user,"<span class='warning'>The [I.name] doesn't seem to fit in here.</span>")
+		return
+	else
+		attackby(I, user)
+//RESEARCHSTATION ONLY END
 
 // This should be used when someone is examining while the case is opened.
 /obj/item/integrated_circuit/proc/internal_examine(mob/user)
