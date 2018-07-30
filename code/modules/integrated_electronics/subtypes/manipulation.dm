@@ -28,6 +28,7 @@
 	power_draw_per_use = 0
 	ext_cooldown = 1
 	var/mode = FALSE
+	demands_object_input = TRUE
 
 	var/stun_projectile = null		//stun mode projectile type
 	var/stun_projectile_sound
@@ -182,6 +183,7 @@
 	activators = list("prime grenade" = IC_PINTYPE_PULSE_IN)
 	spawn_flags = IC_SPAWN_RESEARCH
 	action_flags = IC_ACTION_COMBAT
+	demands_object_input = TRUE
 	var/obj/item/grenade/attached_grenade
 	var/pre_attached_grenade_type
 
