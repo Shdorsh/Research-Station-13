@@ -440,6 +440,7 @@
 		if(!user.canUnEquip(I))
 			return FALSE
 		if(try_add_component(I, user))
+			interact(user)
 			return TRUE
 		else
 			for(var/obj/item/integrated_circuit/input/S in assembly_components)
@@ -466,22 +467,54 @@
 				S.attackby_react(I,user,user.a_intent)
 			return ..()
 		var/obj/item/stock_parts/cell = I
-		user.transferItemToLoc(I, loc)
+		user.transferItemToLoc(I, contents)
 		cell.forceMove(src)
 		battery = cell
 		diag_hud_set_circuitstat() //update diagnostic hud
 		playsound(get_turf(src), 'sound/items/Deconstruct.ogg', 50, 1)
 		to_chat(user, "<span class='notice'>You slot \the [cell] inside \the [src]'s power supplier.</span>")
+		interact(user)
 		return TRUE
 	else if(istype(I, /obj/item/integrated_electronics/detailer))
 		var/obj/item/integrated_electronics/detailer/D = I
 		detail_color = D.detail_color
 		update_icon()
-	else
-		for(var/obj/item/integrated_circuit/input/S in assembly_components)
-			S.attackby_react(I,user,user.a_intent)
-		if(user.a_intent != INTENT_HELP)
-			return ..()
+		return ..()
+	// RESEARCHSTATION ONLY START
+	if(user.a_intent != "help" || !(opened))
+		return ..()
+	var/list/input_selection = list()
+	//Check all the components asking for an input
+	for(var/obj/item/integrated_circuit/input in assembly_components)
+		if(input.demands_object_input)
+			var/i = 0
+			//Check if there is another component with the same name and append a number for identification
+			for(var/s in input_selection)
+				var/obj/item/integrated_circuit/s_circuit = input_selection[s]
+				if(s_circuit.name == input.name && s_circuit.displayed_name == input.displayed_name && s_circuit != input)
+					i++
+			var/disp_name= "[input.displayed_name] \[[input]\]"
+			if(i)
+				disp_name += " ([i+1])"
+			//Associative lists prevent me from needing another list and using a Find proc
+			input_selection[disp_name] = input
+
+	var/obj/item/integrated_circuit/choice
+	if(input_selection)
+		if(input_selection.len == 1)
+			choice = input_selection[input_selection[1]]
+		else
+			var/selection = input(user, "Where do you want to insert that item?", "Interaction") as null|anything in input_selection
+			if(!check_interactivity(user))
+				return ..()
+			if(selection)
+				choice = input_selection[selection]
+			if(choice)
+				choice.additem(I, user)
+	// RESEARCHSTATION ONLY END
+	for(var/obj/item/integrated_circuit/input/S in assembly_components)
+		S.attackby_react(I,user,user.a_intent)
+	return ..()
 
 
 /obj/item/electronic_assembly/attack_self(mob/user)
